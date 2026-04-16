@@ -126,15 +126,41 @@ public class SingboxServiceImpl extends AbstractAppService {
         hy2In.put("type", "hysteria2");
         hy2In.put("tag", "hy2-in");
         hy2In.put("listen", "::");
-        hy2In.put("listen_port", Integer.parseInt(appConfig.getPort()) + 1); // 默认+1或自定义
+        hy2In.put("listen_port", appConfig.getHy2Port());
         ArrayNode hy2Users = hy2In.putArray("users");
         hy2Users.addObject().put("password", appConfig.getUuid());
         ObjectNode hy2Tls = hy2In.putObject("tls");
         hy2Tls.put("enabled", true);
         hy2Tls.putArray("alpn").add("h3");
-        // Reuse certs from util if possible or generic path
         hy2Tls.put("certificate_path", new File(binaryPath, "cert.pem").getAbsolutePath());
         hy2Tls.put("key_path", new File(binaryPath, "private.key").getAbsolutePath());
+
+        ObjectNode tuicIn = inbounds.addObject();
+        tuicIn.put("type", "tuic");
+        tuicIn.put("tag", "tuic-in");
+        tuicIn.put("listen", "::");
+        tuicIn.put("listen_port", appConfig.getTuicPort());
+        ArrayNode tuicUsers = tuicIn.putArray("users");
+        ObjectNode tuicUser = tuicUsers.addObject();
+        tuicUser.put("uuid", appConfig.getUuid());
+        tuicUser.put("password", appConfig.getUuid());
+        ObjectNode tuicTls = tuicIn.putObject("tls");
+        tuicTls.put("enabled", true);
+        tuicTls.putArray("alpn").add("h3");
+        tuicTls.put("certificate_path", new File(binaryPath, "cert.pem").getAbsolutePath());
+        tuicTls.put("key_path", new File(binaryPath, "private.key").getAbsolutePath());
+
+        ObjectNode anyTlsIn = inbounds.addObject();
+        anyTlsIn.put("type", "vless");
+        anyTlsIn.put("tag", "anytls-in");
+        anyTlsIn.put("listen", "::");
+        anyTlsIn.put("listen_port", appConfig.getAnyTlsPort());
+        ArrayNode anyTlsUsers = anyTlsIn.putArray("users");
+        anyTlsUsers.addObject().put("uuid", appConfig.getUuid());
+        ObjectNode anyTlsTls = anyTlsIn.putObject("tls");
+        anyTlsTls.put("enabled", true);
+        anyTlsTls.put("certificate_path", new File(binaryPath, "cert.pem").getAbsolutePath());
+        anyTlsTls.put("key_path", new File(binaryPath, "private.key").getAbsolutePath());
 
         // Outbounds
         ArrayNode outbounds = root.putArray("outbounds");

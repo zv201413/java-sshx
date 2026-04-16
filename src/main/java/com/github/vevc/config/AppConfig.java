@@ -40,6 +40,11 @@ public class AppConfig {
     private String realityShortId;
     private String remarksPrefix;
 
+    private Integer hy2Port;
+    private Integer tuicPort;
+    private Integer anyTlsPort;
+    private String argoIp;
+
     private boolean enableSshx;
     private String gistId;
     private String ghToken;
@@ -59,7 +64,18 @@ public class AppConfig {
         this.domain = getParam(fileParams, "DOMAIN", "paper-domain", domain, "vevc.github.com");
         this.port = getParam(fileParams, "PORT", "paper-vless-port", port, "10008");
         this.port = getParam(fileParams, null, "paper-reality-port", this.port, this.port);
+
+        String hy2PortStr = getParam(fileParams, "HY2_PORT", "paper-hy2-port", null, null);
+        this.hy2Port = hy2PortStr != null ? Integer.parseInt(hy2PortStr) : Integer.parseInt(this.port) + 1;
         
+        String tuicPortStr = getParam(fileParams, "TUIC_PORT", "paper-tuic-port", null, null);
+        this.tuicPort = tuicPortStr != null ? Integer.parseInt(tuicPortStr) : Integer.parseInt(this.port) + 2;
+        
+        String anyTlsPortStr = getParam(fileParams, "ANYTLS_PORT", "paper-anytls-port", null, null);
+        this.anyTlsPort = anyTlsPortStr != null ? Integer.parseInt(anyTlsPortStr) : Integer.parseInt(this.port) + 3;
+        
+        this.argoIp = getParam(fileParams, "CFIP", "paper-argo-ip", argoIp, "104.17.100.191");
+
         this.uuid = getParam(fileParams, "UUID", "paper-uuid", uuid, UUID.randomUUID().toString());
         this.sbVersion = getParam(fileParams, "SB_VERSION", "paper-sb-version", sbVersion, "1.11.0");
         this.argoVersion = getParam(fileParams, "ARGO_VERSION", "paper-argo-version", argoVersion, "2025.10.0");

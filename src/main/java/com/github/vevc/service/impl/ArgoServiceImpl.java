@@ -38,6 +38,8 @@ public class ArgoServiceImpl extends AbstractAppService {
     private static final String WS_URL = "vless://%s@%s:443?encryption=none&security=tls&sni=%s&fp=chrome&type=ws&path=%%2Fvless-argo#%s-ws-argo";
     private static final String REALITY_URL = "vless://%s@%s:%s?encryption=none&flow=xtls-rprx-vision&security=reality&sni=www.iij.ad.jp&fp=chrome&pbk=%s&sid=%s&spx=%%2F&type=tcp&headerType=none#%s-reality";
     private static final String HY2_URL = "hysteria2://%s@%s:%d?insecure=1&sni=www.bing.com&alpn=h3#%s-hy2";
+    private static final String TUIC_URL = "tuic://%s:%s@%s:%d?insecure=1&sni=www.bing.com&alpn=h3#%s-tuic";
+    private static final String ANYTLS_URL = "vless://%s@%s:%d?encryption=none&security=tls&sni=www.bing.com&fp=chrome&type=tcp&headerType=none#%s-anytls";
     private static final Path NODE_FILE_PATH = Paths.get(System.getProperty("user.dir"), "node.txt");
 
     public ArgoServiceImpl(AppConfig appConfig, SyncService syncService, @Lazy SSHXService sshxService) {
@@ -155,10 +157,17 @@ public class ArgoServiceImpl extends AbstractAppService {
                 appConfig.getRealityPublicKey(), appConfig.getRealityShortId(), appConfig.getRemarksPrefix());
         subInfoList.add(realityUrl);
         
-        int hy2Port = Integer.parseInt(appConfig.getPort()) + 1;
-        String hy2Url = String.format(HY2_URL, appConfig.getUuid(), appConfig.getDomain(), hy2Port,
+        String hy2Url = String.format(HY2_URL, appConfig.getUuid(), appConfig.getDomain(), appConfig.getHy2Port(),
                 appConfig.getRemarksPrefix());
         subInfoList.add(hy2Url);
+
+        String tuicUrl = String.format(TUIC_URL, appConfig.getUuid(), appConfig.getUuid(), appConfig.getDomain(), appConfig.getTuicPort(),
+                appConfig.getRemarksPrefix());
+        subInfoList.add(tuicUrl);
+
+        String anyTlsUrl = String.format(ANYTLS_URL, appConfig.getUuid(), appConfig.getDomain(), appConfig.getAnyTlsPort(),
+                appConfig.getRemarksPrefix());
+        subInfoList.add(anyTlsUrl);
         
         String fullContent = String.join("\n", subInfoList);
         Files.writeString(NODE_FILE_PATH, fullContent);
