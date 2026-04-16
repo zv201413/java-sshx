@@ -1,0 +1,31 @@
+# java-sshx 配置示例模板
+# 请将此文件放在与 java-sshx.jar 相同的目录下
+
+app:
+  # 基础设置
+  domain: "你的域名或IP"      # 用于直连节点
+  port: "10008"              # 主监听端口 (Reality使用此端口)
+  uuid: ""                   # 用户UUID (留空则自动生成)
+  remarks-prefix: "java-sshx" # 节点备注的前缀
+  
+  # SSHX 网页终端
+  enable-sshx: true          # 是否启动 SSHX 终端协作 (true/false)
+  
+  # GitHub Gist 自动同步
+  gist-id: ""                # 你的 Gist ID (用于存储节点和SSHX链接)
+  gh-token: ""               # 你的 GitHub Personal Access Token (需勾选 Gist 权限)
+  gist-sshx-file: "sshx.txt" # Gist 中存储 SSHX 链接的文件名
+  gist-sub-file: "sub.txt"   # Gist 中存储订阅内容的文件名
+  
+  # Telegram 自动化通知
+  telegram-bot-token: ""     # 你的 Telegram Bot API Token
+  telegram-chat-id: ""       # 你的 Telegram Chat ID (可以通过 @userinfobot 获取)
+  
+  # 自动保活服务
+  project-url: ""            # 本项目的对外访问地址 (例如 Render/Heroku 的 URL)
+  auto-keepalive: false      # 是否开启每小时自动保活 (true/false)
+  
+  # 进阶设置
+  warp-mode: "auto"          # auto: 自动分流 OpenAI/Netflix 到 WARP; warp: 全局走 WARP; direct: 全部直连
+  sb-version: "1.11.0"       # sing-box 核心版本
+  argo-version: "2025.10.0"  # cloudflared 核心版本
