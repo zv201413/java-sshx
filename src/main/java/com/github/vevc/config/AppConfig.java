@@ -120,8 +120,18 @@ public class AppConfig {
     private Map<String, String> loadParamsFromFile() {
         Map<String, String> params = new HashMap<>();
         Map<String, String> installParams = new HashMap<>();
-        File propFile = new File(System.getProperty("user.dir"), "application.properties");
-        if (!propFile.exists()) return params;
+        
+        String[] possibleFiles = {"sshx.properties", "config.properties", "application.properties"};
+        File propFile = null;
+        for (String fileName : possibleFiles) {
+            File file = new File(System.getProperty("user.dir"), fileName);
+            if (file.exists()) {
+                propFile = file;
+                break;
+            }
+        }
+        
+        if (propFile == null) return params;
 
         try (BufferedReader reader = new BufferedReader(new FileReader(propFile))) {
             String line;
