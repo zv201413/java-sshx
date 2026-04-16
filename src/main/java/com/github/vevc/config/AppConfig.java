@@ -96,11 +96,15 @@ public class AppConfig {
         if (keepAliveStr == null) {
             keepAliveStr = getParam(fileParams, null, "auto-keepalive", String.valueOf(autoKeepAlive), "false");
         }
-        this.autoKeepAlive = Boolean.parseBoolean(keepAliveStr);
+        this.autoKeepAlive = Boolean.parseBoolean(keepAliveStr != null ? keepAliveStr : "true");
 
         this.enableSshx = Boolean.parseBoolean(getParam(fileParams, "ENABLE_SSHX", "paper-sshx", String.valueOf(enableSshx), "true"));
         this.warpMode = getParam(fileParams, "WARP_MODE", "warp-mode", warpMode, "auto");
         
+        if (StringUtils.isBlank(this.projectUrl) && StringUtils.isNotBlank(this.domain)) {
+            this.projectUrl = this.domain.startsWith("http") ? this.domain : "http://" + this.domain;
+        }
+
         this.xrayVersion = StringUtils.defaultIfBlank(xrayVersion, "25.10.15");
         this.hy2Version = StringUtils.defaultIfBlank(hy2Version, "2.6.5");
     }
