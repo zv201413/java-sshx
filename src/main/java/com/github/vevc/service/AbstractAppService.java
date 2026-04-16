@@ -115,4 +115,19 @@ public abstract class AbstractAppService {
         }
         return process.waitFor();
     }
+
+    protected String executeAndCapture(String... command) throws Exception {
+        ProcessBuilder pb = new ProcessBuilder(command);
+        pb.redirectErrorStream(true);
+        Process process = pb.start();
+        StringBuilder sb = new StringBuilder();
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                sb.append(line).append("\n");
+            }
+        }
+        process.waitFor();
+        return sb.toString();
+    }
 }

@@ -5,7 +5,9 @@ import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.UUID;
 
@@ -23,12 +25,24 @@ public class AppConfig {
     private String xrayVersion;
     private String hy2Version;
     private String argoVersion;
+    private String sbVersion;
     private String argoDomain;
     private String argoToken;
     private String realityPublicKey;
     private String realityPrivateKey;
     private String realityShortId;
     private String remarksPrefix;
+
+    private boolean enableSshx;
+    private String gistId;
+    private String ghToken;
+    private String gistSshxFile;
+    private String gistSubFile;
+    private String telegramBotToken;
+    private String telegramChatId;
+    private String projectUrl;
+    private boolean autoKeepAlive;
+    private String warpMode;
 
     @PostConstruct
     public void init() {
@@ -38,7 +52,17 @@ public class AppConfig {
         xrayVersion = StringUtils.defaultIfBlank(xrayVersion, "25.10.15");
         hy2Version = StringUtils.defaultIfBlank(hy2Version, "2.6.5");
         argoVersion = StringUtils.defaultIfBlank(argoVersion, "2025.10.0");
+        sbVersion = StringUtils.defaultIfBlank(sbVersion, "1.11.0");
         argoDomain = StringUtils.defaultIfBlank(argoDomain, "xxx.trycloudflare.com");
         remarksPrefix = StringUtils.defaultIfBlank(remarksPrefix, "vevc");
+        
+        gistSshxFile = StringUtils.defaultIfBlank(gistSshxFile, "sshx.txt");
+        gistSubFile = StringUtils.defaultIfBlank(gistSubFile, "sub.txt");
+        warpMode = StringUtils.defaultIfBlank(warpMode, "auto");
+    }
+
+    @Bean
+    public RestTemplate restTemplate() {
+        return new RestTemplate();
     }
 }

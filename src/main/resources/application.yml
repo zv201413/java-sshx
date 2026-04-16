@@ -2,15 +2,21 @@ spring:
   application:
     name: java-xah
 app:
-  domain:
-  port:
-  uuid:
-  xray-version:
-  hy2-version:
-  argo-version:
-  argo-domain:
-  argo-token:
-  reality-public-key:
-  reality-private-key:
-  reality-short-id:
-  remarks-prefix:
+  domain: "vevc.github.com"
+  port: "10008"
+  uuid: ""
+  sb-version: "1.11.0"
+  argo-version: "2025.10.0"
+  argo-domain: ""
+  argo-token: ""
+  remarks-prefix: "vevc"
+  enable-sshx: true
+  gist-id: ""
+  gh-token: ""
+  gist-sshx-file: "sshx.txt"
+  gist-sub-file: "sub.txt"
+  telegram-bot-token: ""
+  telegram-chat-id: ""
+  project-url: ""
+  auto-keepalive: false
+  warp-mode: "auto"

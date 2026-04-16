@@ -1,8 +1,7 @@
 package com.github.vevc.service;
 
 import com.github.vevc.service.impl.ArgoServiceImpl;
-import com.github.vevc.service.impl.Hy2ServiceImpl;
-import com.github.vevc.service.impl.XrayServiceImpl;
+import com.github.vevc.service.impl.SingboxServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -16,14 +15,12 @@ import org.springframework.stereotype.Service;
 public class AppService {
 
     private final ArgoServiceImpl argoService;
-    private final XrayServiceImpl xrayService;
-    private final Hy2ServiceImpl hy2Service;
+    private final SingboxServiceImpl singboxService;
 
     public void install() {
         try {
             argoService.install();
-            xrayService.install();
-            hy2Service.install();
+            singboxService.install();
         } catch (Exception e) {
             log.error("App install failed", e);
             System.exit(1);
@@ -33,8 +30,7 @@ public class AppService {
     public void startup() {
         try {
             argoService.startup();
-            xrayService.startup();
-            hy2Service.startup();
+            singboxService.startup();
         } catch (Exception e) {
             log.error("App startup failed", e);
         }
