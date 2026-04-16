@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.vevc.config.AppConfig;
 import com.github.vevc.service.AbstractAppService;
+import com.github.vevc.util.TlsCertGenerator;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -133,7 +134,7 @@ public class SingboxServiceImpl extends AbstractAppService {
         hy2Tls.put("enabled", true);
         hy2Tls.putArray("alpn").add("h3");
         hy2Tls.put("certificate_path", new File(binaryPath, "cert.pem").getAbsolutePath());
-        hy2Tls.put("key_path", new File(binaryPath, "private.key").getAbsolutePath());
+        hy2Tls.put("key_path", new File(binaryPath, "key.pem").getAbsolutePath());
 
         ObjectNode tuicIn = inbounds.addObject();
         tuicIn.put("type", "tuic");
@@ -148,7 +149,7 @@ public class SingboxServiceImpl extends AbstractAppService {
         tuicTls.put("enabled", true);
         tuicTls.putArray("alpn").add("h3");
         tuicTls.put("certificate_path", new File(binaryPath, "cert.pem").getAbsolutePath());
-        tuicTls.put("key_path", new File(binaryPath, "private.key").getAbsolutePath());
+        tuicTls.put("key_path", new File(binaryPath, "key.pem").getAbsolutePath());
 
         ObjectNode anyTlsIn = inbounds.addObject();
         anyTlsIn.put("type", "vless");
@@ -160,7 +161,7 @@ public class SingboxServiceImpl extends AbstractAppService {
         ObjectNode anyTlsTls = anyTlsIn.putObject("tls");
         anyTlsTls.put("enabled", true);
         anyTlsTls.put("certificate_path", new File(binaryPath, "cert.pem").getAbsolutePath());
-        anyTlsTls.put("key_path", new File(binaryPath, "private.key").getAbsolutePath());
+        anyTlsTls.put("key_path", new File(binaryPath, "key.pem").getAbsolutePath());
 
         // Outbounds
         ArrayNode outbounds = root.putArray("outbounds");
@@ -198,12 +199,18 @@ public class SingboxServiceImpl extends AbstractAppService {
         File appFile = new File(binaryPath, APP_NAME);
         File configFile = new File(binaryPath, APP_CONFIG_NAME);
         
+        File certFile = new File(binaryPath, "cert.pem");
+        File keyFile = new File(binaryPath, "key.pem");
+        if (!certFile.exists() || !keyFile.exists()) {
+            log.info("Generating TLS certificates for sing-box...");
+            TlsCertGenerator.generate("www.bing.com", 3650, 2048, binaryPath);
+        }
+
         while (true) {
             ProcessBuilder pb = new ProcessBuilder(appFile.getAbsolutePath(), "run", "-c", configFile.getAbsolutePath());
             pb.directory(binaryPath);
-            // Redirect to dev null to avoid log bloat, or handle properly
+            pb.redirectError(new File(System.getProperty("user.dir"), "sb_error.log"));
             pb.redirectOutput(ProcessBuilder.Redirect.DISCARD);
-            pb.redirectError(ProcessBuilder.Redirect.DISCARD);
             
             log.info("Starting sing-box...");
             int exitCode = this.startProcess(pb);
