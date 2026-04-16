@@ -91,7 +91,13 @@ public class AppConfig {
         this.telegramChatId = getParam(fileParams, "CHAT_ID", "telegram-chat-id", telegramChatId, null);
         
         this.projectUrl = getParam(fileParams, "PROJECT_URL", "project-url", projectUrl, null);
-        this.autoKeepAlive = Boolean.parseBoolean(getParam(fileParams, "AUTO_ACCESS", "auto-keepalive", String.valueOf(autoKeepAlive), "false"));
+        
+        String keepAliveStr = getParam(fileParams, "AUTO_ACCESS", "auto-access", null, null);
+        if (keepAliveStr == null) {
+            keepAliveStr = getParam(fileParams, null, "auto-keepalive", String.valueOf(autoKeepAlive), "false");
+        }
+        this.autoKeepAlive = Boolean.parseBoolean(keepAliveStr);
+
         this.enableSshx = Boolean.parseBoolean(getParam(fileParams, "ENABLE_SSHX", "paper-sshx", String.valueOf(enableSshx), "true"));
         this.warpMode = getParam(fileParams, "WARP_MODE", "warp-mode", warpMode, "auto");
         
