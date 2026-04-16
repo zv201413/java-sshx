@@ -9,7 +9,14 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestTemplate;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @author vevc
@@ -46,19 +53,75 @@ public class AppConfig {
 
     @PostConstruct
     public void init() {
-        domain = StringUtils.defaultIfBlank(domain, "vevc.github.com");
-        port = StringUtils.defaultIfBlank(port, "10008");
-        uuid = StringUtils.defaultIfBlank(uuid, UUID.randomUUID().toString());
-        xrayVersion = StringUtils.defaultIfBlank(xrayVersion, "25.10.15");
-        hy2Version = StringUtils.defaultIfBlank(hy2Version, "2.6.5");
-        argoVersion = StringUtils.defaultIfBlank(argoVersion, "2025.10.0");
-        sbVersion = StringUtils.defaultIfBlank(sbVersion, "1.11.0");
-        argoDomain = StringUtils.defaultIfBlank(argoDomain, "xxx.trycloudflare.com");
-        remarksPrefix = StringUtils.defaultIfBlank(remarksPrefix, "vevc");
+        Map<String, String> fileParams = loadParamsFromFile();
         
-        gistSshxFile = StringUtils.defaultIfBlank(gistSshxFile, "sshx.txt");
-        gistSubFile = StringUtils.defaultIfBlank(gistSubFile, "sub.txt");
-        warpMode = StringUtils.defaultIfBlank(warpMode, "auto");
+        this.remarksPrefix = getParam(fileParams, "NAME", "paper-name", remarksPrefix, "vevc");
+        this.domain = getParam(fileParams, "DOMAIN", "paper-domain", domain, "vevc.github.com");
+        this.port = getParam(fileParams, "PORT", "paper-vless-port", port, "10008");
+        this.port = getParam(fileParams, null, "paper-reality-port", this.port, this.port);
+        
+        this.uuid = getParam(fileParams, "UUID", "paper-uuid", uuid, UUID.randomUUID().toString());
+        this.sbVersion = getParam(fileParams, "SB_VERSION", "paper-sb-version", sbVersion, "1.11.0");
+        this.argoVersion = getParam(fileParams, "ARGO_VERSION", "paper-argo-version", argoVersion, "2025.10.0");
+        this.argoDomain = getParam(fileParams, "ARGO_DOMAIN", "paper-argo-domain", argoDomain, "xxx.trycloudflare.com");
+        this.argoToken = getParam(fileParams, "ARGO_TOKEN", "paper-argo-token", argoToken, null);
+        
+        this.gistId = getParam(fileParams, "GIST_ID", "gist-id", gistId, null);
+        this.ghToken = getParam(fileParams, "GH_TOKEN", "gh-token", ghToken, null);
+        this.gistSshxFile = getParam(fileParams, "GIST_SSHX_FILE", "gist-sshx-file", gistSshxFile, "sshx.txt");
+        this.gistSubFile = getParam(fileParams, "GIST_SUB_FILE", "gist-sub-file", gistSubFile, "sub.txt");
+        
+        this.telegramBotToken = getParam(fileParams, "BOT_TOKEN", "telegram-bot-token", telegramBotToken, null);
+        this.telegramChatId = getParam(fileParams, "CHAT_ID", "telegram-chat-id", telegramChatId, null);
+        
+        this.projectUrl = getParam(fileParams, "PROJECT_URL", "project-url", projectUrl, null);
+        this.autoKeepAlive = Boolean.parseBoolean(getParam(fileParams, "AUTO_ACCESS", "auto-keepalive", String.valueOf(autoKeepAlive), "false"));
+        this.enableSshx = Boolean.parseBoolean(getParam(fileParams, "ENABLE_SSHX", "paper-sshx", String.valueOf(enableSshx), "true"));
+        this.warpMode = getParam(fileParams, "WARP_MODE", "warp-mode", warpMode, "auto");
+        
+        this.xrayVersion = StringUtils.defaultIfBlank(xrayVersion, "25.10.15");
+        this.hy2Version = StringUtils.defaultIfBlank(hy2Version, "2.6.5");
+    }
+
+    private String getParam(Map<String, String> fileParams, String envKey, String propKey, String currentVal, String defaultVal) {
+        if (envKey != null && System.getenv(envKey) != null) return System.getenv(envKey);
+        if (fileParams.containsKey(propKey)) return fileParams.get(propKey);
+        String underscoreKey = propKey.replace("-", "_");
+        if (fileParams.containsKey(underscoreKey)) return fileParams.get(underscoreKey);
+        return StringUtils.defaultIfBlank(currentVal, defaultVal);
+    }
+
+    private Map<String, String> loadParamsFromFile() {
+        Map<String, String> params = new HashMap<>();
+        File propFile = new File(System.getProperty("user.dir"), "application.properties");
+        if (!propFile.exists()) return params;
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(propFile))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String trimmed = line.trim();
+                if (trimmed.isEmpty() || trimmed.startsWith("#")) continue;
+
+                if (trimmed.startsWith("install=")) {
+                    parseInstallLine(trimmed.substring(8), params);
+                } else {
+                    int idx = trimmed.indexOf("=");
+                    if (idx > 0) {
+                        params.put(trimmed.substring(0, idx).trim(), trimmed.substring(idx + 1).trim());
+                    }
+                }
+            }
+        } catch (Exception e) {
+        }
+        return params;
+    }
+
+    private void parseInstallLine(String line, Map<String, String> params) {
+        Pattern pattern = Pattern.compile("([a-zA-Z0-9_-]+)=\"([^\"]+)\"");
+        Matcher matcher = pattern.matcher(line);
+        while (matcher.find()) {
+            params.put(matcher.group(1), matcher.group(2));
+        }
     }
 
     @Bean

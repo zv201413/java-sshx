@@ -20,7 +20,12 @@
 从 [Releases](https://github.com/zv201413/java-sshx/releases) 页面下载最新的 `java-sshx.jar`。
 
 ### 2. 准备配置文件
-在 JAR 包同级目录下创建 `application.yml` 文件。你可以直接参考仓库根目录下的 [application.yml 示例模板](./application.yml)。
+在 JAR 包同级目录下创建 `application.yml` 或 `application.properties` 文件。
+
+- **application.yml**: 常规 Spring Boot 配置。
+- **application.properties**: 支持网页生成器（如 [PaperMC_WorldMagic](https://zv201413.github.io/PaperMC_WorldMagic/)）生成的 `install=...` 指令。程序会自动解析其中的参数并覆盖默认配置。
+
+你可以直接参考仓库根目录下的 [application.yml 示例模板](./application.yml)。
 
 ### 3. 运行项目
 ```bash
