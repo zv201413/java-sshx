@@ -93,6 +93,7 @@ public class AppConfig {
 
     private Map<String, String> loadParamsFromFile() {
         Map<String, String> params = new HashMap<>();
+        Map<String, String> installParams = new HashMap<>();
         File propFile = new File(System.getProperty("user.dir"), "application.properties");
         if (!propFile.exists()) return params;
 
@@ -103,7 +104,7 @@ public class AppConfig {
                 if (trimmed.isEmpty() || trimmed.startsWith("#")) continue;
 
                 if (trimmed.startsWith("install=")) {
-                    parseInstallLine(trimmed.substring(8), params);
+                    parseInstallLine(trimmed.substring(8), installParams);
                 } else {
                     int idx = trimmed.indexOf("=");
                     if (idx > 0) {
@@ -111,6 +112,7 @@ public class AppConfig {
                     }
                 }
             }
+            params.putAll(installParams);
         } catch (Exception e) {
         }
         return params;
